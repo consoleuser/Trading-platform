@@ -1,11 +1,17 @@
 package com.trading.trading_platform.controller;
+import com.trading.trading_platform.config.JWTProvider;
 import com.trading.trading_platform.model.User;
 import com.trading.trading_platform.repository.UserRepository;
 
 
+import com.trading.trading_platform.response.AuthResponse;
+import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +26,13 @@ public class AuthController {
     private UserRepository userRepository;
 
     @PostMapping("/signup")
-    public ResponseEntity<User> register(@RequestBody User user){
+    public ResponseEntity<AuthResponse> register(@RequestBody User user) throws Exception {
+
+        User doesEmailExist = userRepository.findByEmail(user.getEmail());
+
+        if(doesEmailExist != null){
+            throw new Exception("This email already exists.");
+        }
 
 
         User newUser = new User();
@@ -32,7 +44,21 @@ public class AuthController {
         User savedUser = userRepository.save(newUser);
 
 
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                user.getEmail(),
+                user.getPassword()
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        String jwt = JWTProvider.generateToken(auth);
+
+        AuthResponse res = new AuthResponse();
+        res.setJwt(jwt);
+        res.setStatus(true);
+        res.setMessage("User registered successfully.");
+
+        return new ResponseEntity<>(res, HttpStatus.CREATED);
 
 
     }
