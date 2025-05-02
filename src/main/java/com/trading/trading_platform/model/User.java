@@ -27,4 +27,11 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    private UserStatus status= UserStatus.PENDING;
+    private boolean isVerified = false;
+
+    @Embedded
+    private TwoFactorAuth twoFactorAuth= new TwoFactorAuth();
+    private String picture;
+
 }
