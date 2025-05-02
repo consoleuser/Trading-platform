@@ -24,7 +24,7 @@ public class JWTProvider {
 
         String jwt = Jwts.builder()
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + 86400000))
+                .setExpiration(new Date(new Date().getTime() + 86400000)) // getTime() + 24 hours
                 .claim("email", auth.getName())
                 .claim("authorities", roles)
                 .signWith(key)
@@ -41,6 +41,8 @@ public class JWTProvider {
         String email = String.valueOf(claims.get("email"));
         return email;
     }
+
+
 
     private static String populateAuthorities(Collection<? extends GrantedAuthority> authorities) {
 

@@ -20,18 +20,19 @@ public class CostumerUserDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-
-
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        if(user == null){
-            throw new UsernameNotFoundException(username);
+        User user = userRepository.findByEmail(email);
+
+        if(user==null) {
+            throw new UsernameNotFoundException("user not found with email  - "+ email);
         }
 
-        List<GrantedAuthority> authorities = new ArrayList<>();
-
-        return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(),authorities);
+        List<GrantedAuthority> authorities=new ArrayList<>();
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),user.getPassword(),authorities);
     }
+
+
 }
