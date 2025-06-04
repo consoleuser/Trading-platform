@@ -9,6 +9,7 @@ import com.trading.trading_platform.response.AuthResponse;
 import com.trading.trading_platform.service.CostumerUserDetailsService;
 import com.trading.trading_platform.service.EmailService;
 import com.trading.trading_platform.service.TwoFactorOtpService;
+import com.trading.trading_platform.service.WatchlistService;
 import com.trading.trading_platform.utils.OtpUtils;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,11 @@ public class AuthController {
 
     @Autowired
     private EmailService emailService;
+
     @Autowired
-    private com.trading.trading_platform.repository.twoFactorOTPRepository twoFactorOTPRepository;
+    private WatchlistService watchlistService;
+
+
 
 
     @PostMapping("/signup")
@@ -58,6 +62,7 @@ public class AuthController {
         newUser.setFullName(user.getFullName());
         User savedUser = userRepository.save(newUser);
 
+        watchlistService.createWatchlist(savedUser);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 user.getEmail(),

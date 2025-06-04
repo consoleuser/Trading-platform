@@ -1,26 +1,27 @@
 package com.trading.trading_platform.model;
 
 
-import com.trading.trading_platform.domain.VerificationType;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Data
-public class VerificationCode {
+public class Watchlist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String otp;
-
     @OneToOne
     private User user;
 
-    private String email;
+    @ManyToMany
+    private List<Coin> coins = new ArrayList<Coin>();
 
-    private String mobile;
 
-    private VerificationType verificationType;
+
+
 }
