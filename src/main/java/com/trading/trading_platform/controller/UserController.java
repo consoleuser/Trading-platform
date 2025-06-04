@@ -44,6 +44,19 @@ public class UserController {
         return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
+
+
+    @GetMapping("/api/users/{userId}")
+    public ResponseEntity<User> findUserById(
+            @PathVariable Long userId,
+            @RequestHeader("Authorization") String jwt) throws Exception {
+
+        User user = userService.findUserProfileById(userId);
+        user.setPassword(null);
+
+        return new ResponseEntity<>(user, HttpStatus.ACCEPTED);
+    }
+
     @PatchMapping("api/users/enable-two-factor/verify-otp/{otp}")
     public ResponseEntity<User> enableTwoFactorAuthentication(
             @PathVariable String otp,
