@@ -17,6 +17,8 @@ import React from 'react'
 import { Button } from '@/components/ui/button'
 import {SheetClose} from '@/components/ui/sheet'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { logout } from '../../State/Auth/Action'
 
 
 
@@ -74,10 +76,15 @@ const menu = [
 
 const Sidebar = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch()
 
-    
-    
 
+
+    const handleLogout=()=>{
+      dispatch(logout());
+      console.log("user logout")
+    }
+    
     return(
 
         <div className='mt-1 space-y-5'>
@@ -87,7 +94,12 @@ const Sidebar = () => {
                      <SheetClose className='w-full'>
                         <Button variant='outline' 
                         className='flex items-center justify-start gap-2 py-5 w-50'
-                        onClick ={ () => navigate(item.path) }
+                        onClick ={ () => {navigate(item.path)
+                          if(item.name == 'Logout'){
+                            handleLogout();
+                          }
+                        } 
+                      }
                         >
 
                             <span className='w-8'>

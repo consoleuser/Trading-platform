@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import {
   Card,
@@ -37,9 +37,23 @@ import WithdrawlForm from './withdrawlForm';
 import TopupForm from './TopupForm';
 import TransferForm from './TransferForm';
 import {Avatar,AvatarFallback} from "@/components/ui/avatar"
+import { useDispatch } from 'react-redux';
+import { getUserWallet } from '../../State/Wallet/Action';
 
 
 function userpaymenthistory() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    handlegetUserWallet()
+  }, [] )
+
+
+  const handlegetUserWallet = () => {
+    dispatch(getUserWallet(localStorage.getItem("jwt")));
+  }
+
+
   return (
     <div className='flex flex-col items-center'>
         <div className='pt-10 w-full lg:w-[60%]'>
@@ -84,13 +98,13 @@ function userpaymenthistory() {
                         shadow-slate-600 
                         shadow-md'>
                             <UploadIcon/>
-                            <span className='text-sm mt-2 font-semibold'> Increase funds</span>
+                            <span className='text-sm mt-2 font-semibold'> Deposit</span>
                         </div>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>
-                          Top up your Wallet
+                          Deposit
                         </DialogTitle>
                         <TopupForm/>
                       </DialogHeader>
@@ -109,13 +123,13 @@ function userpaymenthistory() {
                         shadow-slate-600
                         shadow-md'>
                             <UploadIcon/>
-                            <span className='text-sm mt-2 font-semibold'> Withdraw funds</span>
+                            <span className='text-sm mt-2 font-semibold'> Withdraw</span>
                         </div>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
                         <DialogTitle>
-                          <p className='text-bold'>Request withdrawal</p>
+                          <p className='text-bold'>Withdrawal Request</p>
                         </DialogTitle>
                         <WithdrawlForm/>
                       </DialogHeader>
@@ -132,7 +146,7 @@ function userpaymenthistory() {
                         shadow-slate-600
                         shadow-md'>
                             <UploadIcon/>
-                            <span className='text-sm mt-2 font-semibold'> Transfer funds </span>
+                            <span className='text-sm mt-2 font-semibold'> Transfer </span>
                         </div>
                     </DialogTrigger>
                     <DialogContent>

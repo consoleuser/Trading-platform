@@ -13,12 +13,16 @@ import {
 import { DragHandleHorizontalIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Sidebar from './Sidebar'
+import { useSelector } from 'react-redux'
 
 
 
 
 
 const Navbar = () => {
+  const {auth} = useSelector(store => store)
+  const initials = auth.user.fullName.split(" ").map(name => name[0].toUpperCase()).join(""); 
+
   return (
     <div className="px-2 py-3 border-b z-50 bg-background bg-opacity-0 sticky top-0 left-0 right-0 flex justify-between items-center">
       <div className="flex items-center gap-3">
@@ -38,10 +42,9 @@ const Navbar = () => {
 
               <SheetTitle>
                <div className="text-3x1 flex justify-center items-center gap-1">
-                <Avatar>
-                    <AvatarImage src="/imgs/324143.png"/>
-                    <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
+                {/* <Avatar>
+                    <span data-slot="avatar-fallback" class="flex size-full items-center justify-center rounded-full flex-items-center bg-gray-300 text-gray-800 font-bold">{initials}</span>
+                </Avatar> */}
                 <div>
                     <span className='font-bold text-lime-500'>Lumora</span>
                 </div>
@@ -68,7 +71,9 @@ const Navbar = () => {
         
         <Avatar className='p-1 rounded-full w-12 h-12 cursor-pointer'>
           <AvatarImage src='invalid.jpg' alt='@YK'/>
-          <AvatarFallback className="flex-items-center bg-gray-300 text-gray-800 font-bold">YK</AvatarFallback>
+          <AvatarFallback className="flex-items-center bg-gray-300 text-gray-800 font-bold">
+            {initials}
+            </AvatarFallback>
         </Avatar>
       </div>
     </div>

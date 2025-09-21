@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.trading.trading_platform.config.ApiKeyProvider;
 import com.trading.trading_platform.model.Coin;
 import com.trading.trading_platform.repository.CoinRepository;
 
@@ -31,10 +32,26 @@ public class CoinServiceImpl implements CoinService{
     @Autowired
     private ObjectMapper objectMapper;
 
+    private final ApiKeyProvider apiKeyProvider;
+
+
+    public CoinServiceImpl (
+            CoinRepository coinRepository,
+            ObjectMapper objectMapper,
+            ApiKeyProvider apiKeyProvider) {
+        this.coinRepository = coinRepository;
+        this.objectMapper = objectMapper;
+        this.apiKeyProvider = apiKeyProvider;
+    }
+
 
     @Override
     public List<Coin> getCoinList(int page) throws Exception {
-        String url="https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=10&page="+page;
+
+        String apikey = apiKeyProvider.getKey();
+
+        String url="https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=15&page="+page + apikey;
+
 
         RestTemplate restTemplate = new RestTemplate();
         try{
@@ -55,8 +72,9 @@ public class CoinServiceImpl implements CoinService{
 
     @Override
     public String getMarketChart(String coinId, int days) throws Exception {
-        String url="https://api.coingecko.com/api/v3/coins/"+ coinId + "/market_chart?vs_currency=usd&days="+days;
-
+        String apikey = apiKeyProvider.getKey();
+        String url="https://api.coingecko.com/api/v3/coins/"+ coinId + "/market_chart?vs_currency=usd&days="+days+ apikey;
+        System.out.println(url);
         RestTemplate restTemplate = new RestTemplate();
         try{
             HttpHeaders headers = new HttpHeaders();
@@ -74,7 +92,10 @@ public class CoinServiceImpl implements CoinService{
 
     @Override
     public String getCoinDetails(String coinId) throws Exception {
-        String url="https://api.coingecko.com/api/v3/coins/"+ coinId ;
+
+        String apikey = apiKeyProvider.geDifferentKey();
+        String url="https://api.coingecko.com/api/v3/coins/"+ coinId + apikey  ;
+
         RestTemplate restTemplate = new RestTemplate();
         try{
             HttpHeaders headers = new HttpHeaders();
@@ -123,9 +144,10 @@ public class CoinServiceImpl implements CoinService{
 
     @Override
     public String searchCoin(String keyword) throws Exception {
-        String baseUrl ="https://api.coingecko.com/api/v3/search?query="+keyword;
+        String apikey = apiKeyProvider.getKey();
+        String baseUrl ="https://api.coingecko.com/api/v3/search?query="+keyword + apikey;
 
-        String url="https://api.coingecko.com/api/v3/search?query="+keyword;
+        String url="https://api.coingecko.com/api/v3/search?query="+keyword + apikey;
 
         RestTemplate restTemplate = new RestTemplate();
         try{
