@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   Table,
   TableBody,
@@ -9,9 +9,30 @@ import {
   TableRow, 
 } from '@/components/ui/table'
 import {Avatar, AvatarImage } from "@/components/ui/avatar"
-
+import { useDispatch, useSelector } from 'react-redux';
+import { getWithdrawalHistory } from '../../State/Withdrawl/Action';
 
 function Withdrawal() {
+    const dispatch = useDispatch();
+    const {wallet, withdrawal} = useSelector(store => store);
+   
+  
+    const getTime = (dateString) => {
+      var fields = dateString.split('T');
+      var time = fields[1].split('.');
+      return time[0];
+    }
+
+    const getDate = (dateString) => {
+      var fields = dateString.split('T');
+      return fields[0];
+    }
+   
+    useEffect(() => {
+      dispatch(getWithdrawalHistory(localStorage.getItem("jwt")))
+    }, [])
+    
+
   return (
      <div className='p-5 lg:px-20'>
           <h1 className='font-bold text-3xl pb-4'>Withdrawal</h1>
@@ -31,18 +52,18 @@ function Withdrawal() {
         
                 <TableBody>
         
-                    {[1,1,1].map((item,index) =>
+                    {withdrawal.history.map((item,index) =>
                      <TableRow key={index} >
                       <TableCell>
-                        <p>2025/07/08</p>
+                        <p>{getDate(item.date)}</p>
                       </TableCell>
-                    <TableCell>12:00:05</TableCell>
+                    <TableCell>{getTime(item.date)}</TableCell>
                     <TableCell className="flex items-center gap-2">
                         <span>Bank</span>
                     </TableCell>
-                    <TableCell>8704160005</TableCell>
+                    <TableCell>{item.amount}</TableCell>
                     <TableCell>
-                      Success</TableCell>
+                      {item.status}</TableCell>
                     </TableRow>)}
                 </TableBody>
             </Table>

@@ -6,12 +6,15 @@ import { DotFilledIcon } from '@radix-ui/react-icons'
 import { CreditCard } from 'lucide-react'
 import { Button } from "@/components/ui/Button"
 import {DialogClose} from "@/components/ui/Dialog"
+import { paymentHandler } from '../../State/Wallet/Action'
+import { useDispatch } from 'react-redux'
 
 
 
 const TopupForm = () => {
   const[ amount, setAmount] = React.useState('')
   const[paymentMethod, setPaymentMethod] = React.useState("STRIPE")
+  const dispatch = useDispatch();
   
   const handlePaymentMethodChange = (value) => {
     setPaymentMethod(value)
@@ -21,7 +24,8 @@ const TopupForm = () => {
     setAmount(e.target.value)
   }
   const handleSubmit = () => {
-    console.log(amount, paymentMethod)
+    //console.log("Amount and method ", amount, paymentMethod)
+    dispatch(paymentHandler({jwt:localStorage.getItem("jwt"), paymentMethod, amount}))
   }
 
   // To do ***

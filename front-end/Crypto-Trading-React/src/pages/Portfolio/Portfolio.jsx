@@ -34,7 +34,7 @@ function Portfolio() {
     
             <TableBody>
     
-                {[1,1,1,1,1,1,1,1,1,1,1,1].map((item,index) =>
+                {[1,1,1,1,1,1,1,1].map((item,index) =>
                  <TableRow key={index} >
                 <TableCell className="font-medium flex items-center gap-2">
                     <Avatar className="-z-50">

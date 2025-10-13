@@ -4,8 +4,12 @@ import { useForm } from 'react-hook-form'
 import {Input } from "@/components/ui/input"
 import {Button} from "@/components/ui/button"
 import { DialogClose } from '@radix-ui/react-dialog'
+import { useDispatch } from 'react-redux'
+import { addPaymentDetails } from '../../State/Withdrawl/Action'
 
 const PaymentDetailForm = () => {
+  const dispatch = useDispatch();
+  
   const form = useForm({
     resolver:"",
     defaultValues:{
@@ -15,6 +19,7 @@ const PaymentDetailForm = () => {
     }
   })
   const onSubmit=(data) => {
+    dispatch(addPaymentDetails({paymentDetails:data, jwt:localStorage.getItem("jwt") }))
     console.log(data)
   }
   

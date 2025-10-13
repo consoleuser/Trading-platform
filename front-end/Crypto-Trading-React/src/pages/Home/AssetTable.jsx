@@ -10,22 +10,19 @@ import {
 } from '@/components/ui/table'
 import {Avatar, AvatarImage } from "@/components/ui/avatar"
 import { useNavigate } from 'react-router-dom'
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 
-
-
-
-const AssetTable = () => {
+const AssetTable = ({coin, category}) => {
 
   const navigate = useNavigate()
   return (
-
+      <ScrollArea className={ `${category == "all" ? "h-[77vh] " :  "h-[82vh]" }`}>
         <Table>
-
         <TableHeader>
             <TableRow>
         
-            <TableHead>Coin</TableHead>
+            <TableHead className="w-[180px]">Coin</TableHead>
             <TableHead>Symbol</TableHead>
             <TableHead>Volume</TableHead>
             <TableHead>Market Cap</TableHead>
@@ -34,23 +31,24 @@ const AssetTable = () => {
             </TableRow>
         </TableHeader>
 
-        <TableBody>
+        <TableBody> 
 
-            {[1,1,1,1,1,1,1,1,1,1,1,1].map((item,index) =>
-             <TableRow key={index} >
-            <TableCell onClick={() => navigate('/market/bitcoin')} className="font-medium flex items-center gap-2">
+            {coin.map(
+              (coin,index) => <TableRow key={index} >
+            <TableCell onClick={() => navigate(`/market/${coin.id}`)} className="font-medium flex items-center gap-2 w-[180px]">
                 <Avatar className="-z-50">
-                    <AvatarImage src="https://s.yimg.com/zb/imgv1/2877aef2-b99b-3601-a6fa-7e33a8ef241b/t_500x300"/>
-                </Avatar><span>Bitcoin</span>
+                    <AvatarImage src={coin.image}/>
+                </Avatar><span>{coin.name}</span>
             </TableCell>
-            <TableCell><span className='font-medium'>BTC</span></TableCell>
-            <TableCell>8704160005</TableCell>
-            <TableCell>$250.00</TableCell>
-            <TableCell>-0.79112</TableCell>
-             <TableCell className="text-right">$103522</TableCell>
+            <TableCell><span className='font-medium'>{coin.symbol.toUpperCase()}</span></TableCell>
+            <TableCell>{coin.total_volume}</TableCell>
+            <TableCell>{coin.market_cap}</TableCell>
+            <TableCell>{coin.market_cap_change_percentage_24h}</TableCell>
+             <TableCell className="text-right">${coin.current_price}</TableCell>
             </TableRow>)}
         </TableBody>
-    </Table>
+        </Table>
+      </ScrollArea>
   )
 }
 

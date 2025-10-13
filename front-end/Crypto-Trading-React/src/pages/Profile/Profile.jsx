@@ -23,8 +23,10 @@ import {
 } from "@/components/ui/card"
 
 import AccountVerificationForm from './accountVerificationForm';
+import { useSelector } from 'react-redux';
 
 function Profile() {
+  const {auth} = useSelector(store => store);
 
   const handleEnableTwoStepVerification = () => {
     console.log("two step verification")
@@ -42,7 +44,7 @@ function Profile() {
                 
                 <div className= "flex">
                   <p className='w-[8rem]'>Name: </p>
-                  <p className='text-gray-400'>Yuriy Kotyashko</p>
+                  <p className='text-gray-400'>{auth.user?.fullName}</p>
                 </div>
                 
                 <div className= "flex">
@@ -52,7 +54,7 @@ function Profile() {
                 
                 <div className= "flex">
                   <p className='w-[8rem]'>Email </p>
-                  <p className='text-gray-400'>yuriykotyashko7@gmail.com</p>
+                  <p className='text-gray-400'>{auth.user.email}</p>
                 </div>
 
                  <div className= "flex">
