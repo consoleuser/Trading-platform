@@ -10,7 +10,6 @@ public class ApiKeyProvider {
 
     private String key;
 
-
     public String getKey() {
         return "&x_cg_demo_api_key=" + key;
     }

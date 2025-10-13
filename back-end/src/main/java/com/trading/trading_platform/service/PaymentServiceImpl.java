@@ -20,9 +20,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private PaymentOrderRepository paymentOrderRepository;
 
+
     @Value("${stripe.api.key}")
     private String stripeSecretKey;
-
 
     @Override
     public PaymentOrder createOrder(User user, Long amount, PaymentMethod method) {
@@ -60,14 +60,11 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentResponse createStripePaymentLink(User user, Long amount, Long orderId) throws StripeException {
         Stripe.apiKey = stripeSecretKey;
-
-
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:5455/api/wallet/payment-success?order_id=" + orderId + "&payment_id={CHECKOUT_SESSION_ID}")
-               // .setSuccessUrl("http://localhost:5455/api/wallet?order_id="+orderId)
-                .setCancelUrl("http://localhost:5455/payment/cancel")
+                .setSuccessUrl("http://localhost:5173/wallet?order_id="+orderId + "&payment_id={CHECKOUT_SESSION_ID}")
+                .setCancelUrl("http://localhost:5173/payment/cancel")
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setQuantity(1L)
                         .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
@@ -90,7 +87,6 @@ public class PaymentServiceImpl implements PaymentService {
 
         PaymentResponse res = new PaymentResponse();
         res.setPaymentURL(session.getUrl());
-
         return res;
     }
 }

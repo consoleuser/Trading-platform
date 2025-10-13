@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.List;
 
 
 @RestController
@@ -84,6 +85,15 @@ public class WalletController {
         Wallet wallet = walletService.payOrderPayment(order, user);
 
         return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/api/wallet/transactions")
+    public ResponseEntity<List<WalletTransaction>> getWalletTransaction(
+            @RequestHeader("Authorization")String jwt) throws Exception {
+        User user=userService.findUserProfileByJwt(jwt);
+        Wallet wallet = walletService.getUserWallet(user);
+        List<WalletTransaction> transactions=walletTransactionService.getTransactions(wallet,null);
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
 
 

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 import {
   Card,
@@ -38,19 +39,50 @@ import TopupForm from './TopupForm';
 import TransferForm from './TransferForm';
 import {Avatar,AvatarFallback} from "@/components/ui/avatar"
 import { useDispatch } from 'react-redux';
-import { getUserWallet } from '../../State/Wallet/Action';
+import { depositMoney, getUserWallet, getWalletTransactions } from '../../State/Wallet/Action';
+import { useLocation, useNavigate } from 'react-router-dom';
 
+function useQuery(){
+  return new URLSearchParams(useLocation().search);
+}
 
 function userpaymenthistory() {
+
+  
   const dispatch = useDispatch();
+  const {wallet} = useSelector(store => store)
+  const query = useQuery();
+  const orderId = query.get("order_id");
+  const paymentId = query.get("payment_id");
+  const navigate = useNavigate();
+
+    useEffect(() => {
+    if (orderId) {
+      dispatch(depositMoney({
+          jwt: localStorage.getItem("jwt"),
+          orderId : orderId,
+          paymentId: paymentId || "AuedkfeuUe",
+          navigate,
+        })
+      );
+      console.log(paymentId, orderId);
+    }
+  }, [paymentId, orderId]);
+
 
   useEffect(() => {
-    handlegetUserWallet()
+    handleWalletTransaction();
+    handlegetUserWallet();
   }, [] )
+
 
 
   const handlegetUserWallet = () => {
     dispatch(getUserWallet(localStorage.getItem("jwt")));
+  }
+
+  const handleWalletTransaction = () => {
+    dispatch(getWalletTransactions({jwt:localStorage.getItem("jwt")  }))
   }
 
 
@@ -67,14 +99,14 @@ function userpaymenthistory() {
                           <CardTitle className='text-2xl'> User Wallet</CardTitle>
                           <div className='flex items-center gap-2'>
                             <p className='text-gray-400 cursor-pointer'>
-                              #A475ED
+                              #{wallet?.userWallet.id}
                             </p>
                             <CopyIcon size={20} className='cursor-pointer hover:text-gray-400'/>                            
                           </div>
                         </div>
                     </div>
                     <div>
-                      <ReloadIcon className='w-6 h-6 cursor-pointer hover:text-gray-400'/>
+                      <ReloadIcon onClick={handlegetUserWallet} className='w-6 h-6 cursor-pointer hover:text-gray-400'/>
                     </div>
                 </div>
               </CardHeader>
@@ -82,7 +114,7 @@ function userpaymenthistory() {
                 <div className='flex items-center'>
                   <DollarSign/>
                   <span className='text-2xl font-semibold'>
-                    10,000,00.50
+                    {wallet.userWallet.balance}
                   </span>
 
                 </div>
@@ -166,11 +198,11 @@ function userpaymenthistory() {
           <div className='py-5 pt-10'>
             <div className='flex gap-2 items-center pb-5'>
               <h1 className='text-2xl font-semibold'>History</h1>
-              <RefreshCw className='h-6 w-6 cursor-pointer hover:text-gray-400'/>
+              <RefreshCw onClick={handleWalletTransaction} className='h-6 w-6 cursor-pointer hover:text-gray-400'/>
             </div>
 
             <div className="space-y-5">
-              {[1,1,1,1,1,1,1,1].map((item,i) => <div key={i}>
+              {wallet.transactions.map((item,i) => <div key={i}>
                 <Card className="px-5 py-2 flex justify-between items-center">
                   <div className='flex items-center gap-5 w-full'>
                     <Avatar>
@@ -180,12 +212,12 @@ function userpaymenthistory() {
                     </Avatar>
 
                     <div className='space-y-1 '>
-                      <h1 className=''>Buy Asset</h1>
-                      <p className='text-sm font-semi-bold text-gray-400'>2025-07-14</p>
+                      <h1 className=''>{item.type}</h1>
+                      <p className='text-sm font-semi-bold text-gray-400'>{item.date}</p>
                     </div>
 
                     <div className='ml-auto'>
-                      <p className="text-green-500 font-semibold">999 CAD</p>
+                      <p className="text-green-500 font-semibold">{item.amount}</p>
                     </div>
                     
                   </div>

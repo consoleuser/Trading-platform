@@ -1,12 +1,11 @@
 package com.trading.trading_platform.service;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.trading.trading_platform.config.ApiKeyProvider;
+
 import com.trading.trading_platform.model.Coin;
 import com.trading.trading_platform.repository.CoinRepository;
 
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+
 
 import java.util.List;
 import java.util.Optional;

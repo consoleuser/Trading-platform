@@ -18,24 +18,40 @@ import {
 
 import { Button } from "@/components/ui/button"
 import PaymentDetailForm from "./PaymentDetailForm"
+import { use, useEffect} from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { getPaymentDetails } from "../../State/Withdrawl/Action"
 
+function censoruserbankinfo(info) {
+  const length = info.length;
+  const sub = info.substring(length - 4, length);
+  return "********" + sub;
+}
 
 function PaymentDetails() {
+  const {withdrawal} = useSelector(store => store); 
+  const dispatch = useDispatch();
+
+
+  useEffect(() => {
+    dispatch(getPaymentDetails({jwt:localStorage.getItem("jwt")}))
+  }, [])
+    console.log("payment details ",withdrawal.paymentDetails)
   return (
     <div className="px-20">
       <h1 className="text-3xl font-bold py-10">Payment Details</h1>
-    {true ?  <Card>
+    {withdrawal.paymentDetails ?  <Card>
         <CardHeader>
 
-          <CardTitle>RBC Bank</CardTitle>
+          <CardTitle>{withdrawal.paymentDetails.bankName}</CardTitle>
 
-          <CardDescription>********1651</CardDescription>
+          <CardDescription>{censoruserbankinfo(withdrawal.paymentDetails.accountNumber)}</CardDescription>
         </CardHeader>
 
         <CardContent>
           <div className="flex items-center">
             <p className="w-32">Account Holder: </p>
-            <p className="text-gray-400">Yuriy Kotyashko</p>
+            <p className="text-gray-400">{withdrawal.paymentDetails.accountHolderName}</p>
           </div>
 
           

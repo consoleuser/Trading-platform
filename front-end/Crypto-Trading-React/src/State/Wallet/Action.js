@@ -83,7 +83,7 @@ export const depositMoney =
   };
 
 export const paymentHandler =
-  ({ jwt, amount, paymentMethod }) =>
+  ({ jwt, paymentMethod, amount }) =>
   async (dispatch) => {
     dispatch({ type: types.DEPOSIT_MONEY_REQUEST });
 
@@ -98,7 +98,9 @@ export const paymentHandler =
         }
       );
 
-      window.location.href = response.data.payment_url;
+      console.log("payment response", response.data);
+      console.log("payment url", response.data.payment_url);
+      window.location.href = response.data.paymentURL;  
 
       dispatch({
         type: types.DEPOSIT_MONEY_SUCCESS,
@@ -133,6 +135,8 @@ export const transferMoney =
         type: types.TRANSFER_MONEY_SUCCESS,
         payload: response.data,
       });
+
+      console.log("transfer money sent ------->", response.data);
     } catch (error) {
       dispatch({
         type: types.TRANSFER_MONEY_FAILURE,
@@ -140,3 +144,6 @@ export const transferMoney =
       });
     }
   };
+
+
+

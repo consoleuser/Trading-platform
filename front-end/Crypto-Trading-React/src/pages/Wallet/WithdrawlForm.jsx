@@ -7,11 +7,17 @@ import
   Landmark
 } from 'lucide-react';
 import { DialogClose } from "@/components/ui/dialog";
+import { useDispatch, useSelector } from 'react-redux';
+import { withdrawalRequest } from '../../State/Withdrawl/Action';
 
 
 
 
 const WithdrawlForm = () => {
+    const dispatch = useDispatch();
+    const {wallet, withdrawal} = useSelector(store => store);
+    console.log("withdrawal state ------->", withdrawal);
+    console.log("wallet state -------> ", wallet); 
 
     const [amount, setAmount] = useState();
     const handleChange = (e) => {
@@ -21,7 +27,15 @@ const WithdrawlForm = () => {
       }
     };
 
+    const hideNumber = (String) => {
+      let len = String.length;
+
+      let sub = String.substring(len - 4, len);
+      return "********" + sub;
+    }
+
     const handleSubmit = () => {
+      dispatch(withdrawalRequest({amount:amount, jwt:localStorage.getItem("jwt")}))
       console.log(amount);
     }
 
@@ -35,7 +49,7 @@ const WithdrawlForm = () => {
         <p className='flex items-center'>
           <DollarSign className='w-6 h-6 relative top-0.5'/>
           <span>
-              10,000,00.50
+            {wallet.userWallet.balance}
           </span>
         </p>
       </div>
@@ -56,8 +70,8 @@ const WithdrawlForm = () => {
         <div className='flex items-center gap-5 px-5 py-2 rounded-md'>
           <Landmark className='h-8 w-8'/>
           <div>
-            <p className='text-xl font-bold'>Yuriy </p>
-            <p className='text-xs'>********1651</p>
+            <p className='text-xl font-bold'>{withdrawal.paymentDetails.accountHolderName}</p>
+            <p className='text-xs'>{hideNumber(withdrawal.paymentDetails.accountNumber)}</p>
           </div>
         </div>
     </div>

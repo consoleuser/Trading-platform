@@ -2,12 +2,18 @@ import React from 'react'
 import {Input} from "@/components/ui/input"
 import { Button } from "@/components/ui/Button"
 import {DialogClose} from "@/components/ui/Dialog"
+import { useDispatch, useSelector } from 'react-redux'
+import { transferMoney } from '../../State/Wallet/Action'
 
 
 
 
 const TransferForm = () => {
+  const dispatch = useDispatch();
+  const {wallet} = useSelector(store => store); 
   
+
+
   
   
     const [formData, setFormData] = React.useState({
@@ -23,7 +29,16 @@ const TransferForm = () => {
     }
 
      const handleSubmit = () => {
-        console.log(formData) 
+      dispatch(transferMoney(
+        {jwt:localStorage.getItem("jwt"),
+          walletId:formData.walletId,
+          reqData:{
+            amount: formData.amount,
+            purpose: formData.purpose
+          }
+        }
+      ))  
+      console.log(formData) 
      }
   
     return (
