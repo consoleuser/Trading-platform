@@ -28,6 +28,7 @@ import StockChart from '../Home/StockChart'
 import { useParams } from "react-router-dom"
 import { useDispatch, useSelector } from 'react-redux'
 import { getCoinDetails } from '../../State/Coin/Action'
+import { addItemToWatchlist } from '../../State/Watchlist/Action'
 
 
 
@@ -39,9 +40,13 @@ function StockDetails() {
   const {id} = useParams();
   const {coin} = useSelector(store => store);
 
-useEffect(() => {
-  dispatch(getCoinDetails({ coinId: id, jwt: localStorage.getItem("jwt") }));
-}, [id]);
+  useEffect(() => {
+    dispatch(getCoinDetails({ coinId: id, jwt: localStorage.getItem("jwt") }));
+  }, [id]);
+
+  const handleAddToWatchList = () => {
+    dispatch(addItemToWatchlist({coinId: coin.coinDetails?.id, jwt: localStorage.getItem("jwt")}));
+  }
 
 
 
@@ -63,11 +68,20 @@ useEffect(() => {
 
 
               <div className='flex items-end gap-2'>
-                <p className='text-xl font-bold'>${coin.coinDetails?.market_data.current_price.usd}</p>
-                <p className='text-red-600'>
-                    <span>-{coin.coinDetails?.market_data.market_cap_change_24h}</span>
-                    <span>(-{coin.coinDetails?.market_data.market_cap_change_percentage_24h}%)</span>
+                <p className='text-xl font-bold'>${coin.coinDetails?.market_data.current_price.cad}</p>
+                {
+                  coin.coinDetails?.market_data.price_change_percentage_24h >= 0 ?
+                  <p className='font-bold text-lime-600'>
+                    <span>{coin.coinDetails?.market_data.market_cap_change_24h}</span>
+                    <span>({coin.coinDetails?.market_data.market_cap_change_percentage_24h}%)</span>
                 </p>
+                :
+                  <p className='font-bold text-red-600'>
+                    <span>{coin.coinDetails?.market_data.market_cap_change_24h}</span>
+                    <span>({coin.coinDetails?.market_data.market_cap_change_percentage_24h}%)</span>
+                 </p>
+                }
+
 
 
               </div>
@@ -75,7 +89,7 @@ useEffect(() => {
           </div>
 
           <div className='flex items-center gap-3'>
-            <Button>
+            <Button onClick={handleAddToWatchList}>
               {true ?
               <BookmarkFilledIcon className="h-6 w-6"/>  
               :  

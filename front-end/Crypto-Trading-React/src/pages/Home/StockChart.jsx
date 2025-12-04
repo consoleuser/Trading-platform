@@ -124,7 +124,6 @@ const StockChart = ({coinId}) => {
     }, [dispatch,coinId, activeLabel]);
 
     return (    
-            //optional can remove cursor pointer from Button
         <div>
             <div className="space-x-3">
             {timeSeries.map((item) => (

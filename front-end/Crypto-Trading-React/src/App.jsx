@@ -33,7 +33,8 @@ function App() {
     <>
 
       
-      {auth.user ? <div>
+      {auth.user ? 
+      <div>
         <Navbar/>
         <Routes>
           <Route path = "/" element = {<Home/>} />

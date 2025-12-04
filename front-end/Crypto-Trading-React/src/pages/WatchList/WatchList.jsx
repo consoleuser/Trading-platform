@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   Table,
   TableBody,
@@ -11,12 +11,19 @@ import {
 import {Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from '../../components/ui/button'
 import { BookmarkFilledIcon } from '@radix-ui/react-icons'
+import { useDispatch, useSelector } from 'react-redux'
+import { getUserWatchlist } from '../../State/Watchlist/Action'
 
 
 function WatchList() {
-  
+    const {watchlist} = useSelector(store => store);
+    const dispatch = useDispatch();
     const handleRemoveToWatchlist=(value) => {console.log(value)}
     
+
+    useEffect( () => {
+        dispatch(getUserWatchlist(localStorage.getItem("jwt")));
+    }, []);
     
     return (  
     <div className='p-5 lg:px-20'>
@@ -39,18 +46,18 @@ function WatchList() {
     
             <TableBody>
     
-                {[1,1,1,1,1,1,1,1,1,1,1,1].map((item,index) =>
+                {watchlist.items.map((item,index) =>
                  <TableRow key={index} >
                 <TableCell className="font-medium flex items-center gap-2">
                     <Avatar className="-z-50">
-                        <AvatarImage src="https://s.yimg.com/zb/imgv1/2877aef2-b99b-3601-a6fa-7e33a8ef241b/t_500x300"/>
-                    </Avatar><span>Bitcoin</span>
+                        <AvatarImage src={item.image} />
+                    </Avatar><span>{item.name}</span>
                 </TableCell>
-                <TableCell><span className='font-medium'>BTC</span></TableCell>
-                <TableCell>8704160005</TableCell>
-                <TableCell>$250.00</TableCell>
-                <TableCell>-0.79112</TableCell>
-                 <TableCell>$103522</TableCell>
+                <TableCell><span className='font-medium'>{item.symbol.toUpperCase()}</span></TableCell>
+                <TableCell>{item.total_volume}</TableCell>
+                <TableCell>${item.market_cap}</TableCell>
+                <TableCell>{item.price_change_24h}</TableCell>
+                 <TableCell>${item.current_price}</TableCell>
                  <TableCell className='text-right'>
                     <Button 
                         onClick={ ()=> handleRemoveToWatchlist(item.id)  } 

@@ -51,9 +51,7 @@ public class OrderController {
                 req.getQuantity(),
                 req.getOrderType(),
                 user);
-
         return ResponseEntity.ok(order);
-
     }
 
     @GetMapping("/{orderId}")
@@ -73,7 +71,7 @@ public class OrderController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Order>> getAllOrdersForUser(
+    public ResponseEntity<List<Order>>getAllOrdersForUser(
             @RequestHeader("Authorization") String jwt,
             @RequestParam(required = false) OrderType order_type,
             @RequestParam(required = false) String asset_symbol

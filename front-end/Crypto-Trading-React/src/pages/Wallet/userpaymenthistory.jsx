@@ -46,9 +46,7 @@ function useQuery(){
   return new URLSearchParams(useLocation().search);
 }
 
-function userpaymenthistory() {
-
-  
+function userpaymenthistory() {  
   const dispatch = useDispatch();
   const {wallet} = useSelector(store => store)
   const query = useQuery();
@@ -217,7 +215,7 @@ function userpaymenthistory() {
                     </div>
 
                     <div className='ml-auto'>
-                      <p className="text-green-500 font-semibold">{item.amount}</p>
+                      <p className="text--500 font-semibold">{item.amount}</p>
                     </div>
                     
                   </div>

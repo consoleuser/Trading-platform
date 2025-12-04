@@ -47,6 +47,7 @@ public class AssetController {
     ) throws Exception {
         User user=userService.findUserProfileByJwt(jwt);
         List<Asset> assets = assetService.getUsersAssets(user.getId());
+            
         return ResponseEntity.ok().body(assets);
     }
 }

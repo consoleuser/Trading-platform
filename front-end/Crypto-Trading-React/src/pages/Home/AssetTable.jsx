@@ -14,8 +14,15 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 
 
 const AssetTable = ({coin, category}) => {
+  const [lastClicked, setLastClicked] = React.useState(null);
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
+  const handleClick = (coin) => {
+    setLastClicked(coin);
+    localStorage.setItem('lastClickedCoin', JSON.stringify(coin)); // persist for other files
+    navigate(`/market/${coin.id}`);
+  };
+
   return (
       <ScrollArea className={ `${category == "all" ? "h-[77vh] " :  "h-[82vh]" }`}>
         <Table>
@@ -35,7 +42,7 @@ const AssetTable = ({coin, category}) => {
 
             {coin.map(
               (coin,index) => <TableRow key={index} >
-            <TableCell onClick={() => navigate(`/market/${coin.id}`)} className="font-medium flex items-center gap-2 w-[180px]">
+            <TableCell onClick={() => handleClick(coin)} className="font-medium flex items-center gap-2 w-[180px]">
                 <Avatar className="-z-50">
                     <AvatarImage src={coin.image}/>
                 </Avatar><span>{coin.name}</span>
