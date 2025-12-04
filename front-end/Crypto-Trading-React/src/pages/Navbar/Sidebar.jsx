@@ -93,7 +93,7 @@ const Sidebar = () => {
                    <div key={item.name}>
                      <SheetClose className='w-full'>
                         <Button variant='outline' 
-                        className='flex items-center justify-start gap-2 py-5 w-50'
+                        className='flex items-center justify-start gap-2 py-5 w-50 mx-3'
                         onClick ={ () => {navigate(item.path)
                           if(item.name == 'Logout'){
                             handleLogout();

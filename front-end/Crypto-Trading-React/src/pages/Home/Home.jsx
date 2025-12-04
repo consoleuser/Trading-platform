@@ -11,7 +11,7 @@ import { MessageCircle } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 import { useDispatch, useSelector } from 'react-redux'
 import { getCoinList } from '@/State/Coin/Action'
-import { getTop50CoinList } from '../../State/Coin/Action'
+import { getCoinById, getTop50CoinList } from '../../State/Coin/Action'
 
 
 import {
@@ -29,12 +29,32 @@ const Home = () => {
     const[inputValue, setInputValue] = React.useState("");    
     const [isBotReleased, setIsBotReleased] = React.useState("False");
     
-    const {coin} = useSelector(store => store);
+    const {coin} = useSelector((store) => store);
+    const lastClickedCoin = JSON.parse(localStorage.getItem("lastClickedCoin") || "null");
     const dispatch = useDispatch(); 
-    
+    const [fallbackCoin, setFallbackCoin] = React.useState(null);
+
+    React.useEffect(() => {
+      if (!lastClickedCoin) {
+        dispatch(getCoinById("bitcoin")).then((action) => {
+          if (action && action.payload) {
+            setFallbackCoin(action.payload);
+          }
+        });
+      }
+    }, [dispatch, lastClickedCoin]);
+
+    const coinToShow = lastClickedCoin || fallbackCoin || {
+      id: "bitcoin",
+      image: "/imgs/Ethereum-stock.webp",
+      name: "Bitcoin",
+      symbol: "BTC",
+      current_price: "0",
+      price_change_24h: "0",
+      price_change_percentage_24h: "0"
+    };
 
     const handleBotRelease = () => setIsBotReleased(!isBotReleased);
-
     const handleCategory = (value) => {
         setCategory(value)
     };
@@ -43,13 +63,18 @@ const Home = () => {
         setInputValue(e.target.value);
     }
 
-    const handleKeyPress = (event) => {
+    const   handleKeyPress = (event) => {
         if(event.key == "Enter"){
             console.log(inputValue)
         }setInputValue("")
     }
 
-    
+      useEffect(() => {
+    if (!lastClickedCoin) {
+      dispatch(getCoinById("bitcoin"));
+    }
+  }, [dispatch, lastClickedCoin]);
+
 
     useEffect(() => {
         dispatch(getTop50CoinList());
@@ -58,9 +83,6 @@ const Home = () => {
     useEffect(() => {
         dispatch(getCoinList(1));
     },[]);
-
-
-
 
 
     return (
@@ -123,30 +145,44 @@ const Home = () => {
                 
                 </div>
                 <div className="hidden lg:block lg:w-[50%] p-5">
-                    <StockChart coinId={"bitcoin"}/>
+                    <StockChart coinId={coinToShow.id} />
                     <div className='flex gap-5 items-center'>
 
                         <div>
                             <Avatar>
-                                <AvatarImage src= "/imgs/Ethereum-stock.webp"/> 
+                                <AvatarImage src={coinToShow.image} />
                                 <AvatarFallback>YK</AvatarFallback>
                             </Avatar>
                         </div>
                     <div>
                         
                         <div className='flex items-center gap-2'>
-                            <p>ETH</p>
+                            <p>{coinToShow.name}</p>
                             <DotIcon className='text-gray-400'/>
-                            <p className='text-gray-400'>Ethereum</p>
+                            <p className='text-gray-400'>{coinToShow.symbol}</p>
                         </div>
 
                         <div className='flex items-end gap-2'>
 
-                            <p className='text-xl font-bold'>5464</p>
-                            <p className='text-red-600'>
-                                <span>-1319049822.578</span>
-                                <span>(-0.29803%)</span>
+                            <p className='text-xl font-bold'>{coinToShow.current_price}</p>
+                            {coin.coinDetails?.market_data.price_change_percentage_24h >= 0  
+                            
+                            ?
+                            
+                            <p className='font-bold text-lime-600'>
+                                <span>{coinToShow.price_change_24h} </span>
+                                <span>({coinToShow.price_change_percentage_24h}%)</span>
                             </p>
+                            
+                            :
+
+                            <p className='font-bold text-red-600'>
+                                <span>{coinToShow.price_change_24h} </span>
+                                <span>({coinToShow.price_change_percentage_24h}%)</span>
+                            </p>
+
+                            }
+    
                         </div>
 
 
@@ -179,8 +215,7 @@ const Home = () => {
                                 <div className='justify-end self-end px-5 py-2 rounded-md bg-gray-300'>
                                     <p>Hey, I'm <span>Lumy</span></p>
                                     {/* <p>Hey, I'm <span className='font-bold text-lime-500 [text-shadow:-1px_-1px_0_#000,1px_-1px_0_#000,-1px_1px_0_#000,1px_1px_0_#000]'>Lumy</span></p> */}
-                                    <p>I can assist you with any questions you have</p>
-                                    <p>try asking for price, market cap, extra...</p>
+                                    <p>I can assist you with any questions you might have. Try asking for price, market cap, extra...</p>
                                 </div>
                             </div>
 
@@ -207,10 +242,9 @@ const Home = () => {
                             <div className='mt-auto flex-none py-20'>
                                 <Input 
                                 className='w-full h-full'
-                                placeHolder="Prompt"
+                                placeHolder="Type your message..."
                                 onChange={handleChange}
                                 value={inputValue}
-                                onKeyPress={handleKeyPress}
                                 />
                             </div>
 

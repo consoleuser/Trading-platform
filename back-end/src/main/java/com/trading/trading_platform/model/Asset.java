@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Asset {
+public class        Asset {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
-
+import { Input } from '@/components/ui/input'
 
 import {
   Sheet,
@@ -14,13 +14,15 @@ import { DragHandleHorizontalIcon, MagnifyingGlassIcon } from '@radix-ui/react-i
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Sidebar from './Sidebar'
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 
 
 
 
 const Navbar = () => {
-  const {auth} = useSelector(store => store)
+    const navigate = useNavigate();
+  const {auth, coin} = useSelector(store => store)
   const initials = auth.user.fullName.split(" ").map(name => name[0].toUpperCase()).join(""); 
 
   return (
@@ -60,11 +62,24 @@ const Navbar = () => {
           Lumora
         </p>
         <div className='p-0 ml-9'>
-          <Button variant='outline' 
-          className='cursor-pointer border-black bg-transparent hover:bg-black/5 justify-start w-100'>
-            <MagnifyingGlassIcon/>
-            <span>Search tokens</span>
-          </Button>
+          <div className="relative flex items-center">
+              <Input 
+                type="email" 
+                placeholder="Search Tokens" 
+                className="cursor-pointer border-black bg-transparent hover:bg-black/5 justify-start w-100 pl-10"
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    const tokenExists = coin.coinList?.some(c => c.id === e.target.value);
+                    if (tokenExists) {
+                      navigate(`/market/${e.target.value}`);
+                    } else {
+                      navigate('*'); 
+                    }
+                  }
+                }}
+              />
+              <MagnifyingGlassIcon className="absolute left-3 h-5 w-5 pointer-events-none" />
+          </div>
         </div>
       </div>
       <div>
