@@ -1,315 +1,177 @@
-# Sharelyst - Mobile Application
+# Trading Platform - Web Application
 
-Sharelyst is a React Native (Expo) mobile app with a Node.js/Express backend for group expense tracking, transactions, and bill splitting.
+Trading Platform is a React + Vite frontend with a Spring Boot backend for crypto trading, wallet management, watchlists, and payments.
 
 ## Repository Layout
 
-- `backend/` - Express API + SQLite database (Render hosted or local)
-- `SharelystApp/` - Expo React Native app (TypeScript, expo-router, NativeWind)
+- `back-end/` - Spring Boot API (Java 21, Spring Security, JPA, MySQL)
+- `front-end/Crypto-Trading-React/` - Vite React app (Redux, Tailwind, Radix UI)
 - `README.md` - This document
-- `run.ps1` - Launches frontend against Render (deployment mode)
-- `fullrun.ps1` - Launches backend + frontend locally (development mode)
 
 ## Quick Start
 
-### Option A: Use Render-hosted backend (fastest)
+### Backend (Spring Boot + MySQL)
 
-1. Ensure the backend is awake:
-   - Visit `https://sharelystbackend.onrender.com/` until it returns `{ "success": true, ... }`.
-2. Start the frontend:
+1. Create a MySQL database named `crypto_trading` and update credentials in `back-end/src/main/resources/application.properties`.
+2. Start the server:
    ```bash
-   cd SharelystApp
-   npx expo start
+   cd back-end
+   mvnw spring-boot:run
+   ```
+   Windows:
+   ```bash
+   cd back-end
+   mvnw.cmd spring-boot:run
    ```
 
-### Option B: Run everything locally
+### Frontend (Vite)
 
-1. Backend:
+1. Start the client:
    ```bash
-   cd backend
+   cd front-end/Crypto-Trading-React
    npm install
-   npm run init:db
    npm run dev
    ```
-2. Frontend:
-   ```bash
-   cd SharelystApp
-   npm install
-   npx expo start
-   ```
-
-### PowerShell helpers
-
-- `run.ps1` (frontend only, deployment mode):
-  - Sets `EXPO_PUBLIC_ENV=deployment`
-  - Installs frontend dependencies
-  - Starts Expo with cache cleared
-- `fullrun.ps1` (backend + frontend, dev mode):
-  - Opens two PowerShell terminals
-  - Backend: `npm install`, `npm run dev`
-  - Frontend: `npm install`, `npx expo start`
+2. The frontend calls the backend at `http://localhost:5455` (see `front-end/Crypto-Trading-React/src/config/api.js`).
 
 ## Tech Stack
 
-### Frontend (`SharelystApp/`)
-- React Native + Expo
-- TypeScript
-- expo-router (file-based routing)
-- NativeWind (Tailwind for RN)
-- axios (HTTP)
-- expo-secure-store (secure token storage)
-- lucide-react-native, Expo icons
+### Frontend (`front-end/Crypto-Trading-React/`)
+- React 19 + Vite
+- React Router
+- Redux + redux-thunk
+- Tailwind CSS + shadcn/ui (Radix UI)
+- Axios
+- ApexCharts
 
-### Backend (`backend/`)
-- Node.js + Express
-- SQLite3
-- JWT auth (jsonwebtoken)
-- bcrypt password hashing
-- CORS + dotenv
+### Backend (`back-end/`)
+- Spring Boot 3.4
+- Spring Security + JWT (jjwt)
+- Spring Data JPA
+- MySQL
+- Stripe Java SDK
+- Spring Mail
 
 ## Environment Variables
 
-### Frontend
-- `EXPO_PUBLIC_ENV`
-  - `deployment`: uses Render URL
-  - default: uses Render URL (same today)
+### Backend (`back-end/src/main/resources/application.properties`)
+```
+spring.application.name=trading
+server.port=5455
 
-### Backend (`backend/.env`)
+spring.jpa.hibernate.ddl-auto=update
+spring.datasource.url=jdbc:mysql://localhost:3306/crypto_trading
+spring.datasource.username=<your-db-user>
+spring.datasource.password=<your-db-password>
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.show-sql=true
+
+gecko.api.key=<your-coingecko-api-key>
+stripe.api.key=<your-stripe-secret-key>
 ```
-NODE_ENV=development
-PORT=3000
-HOST=0.0.0.0
-JWT_SECRET=your-secret
-JWT_EXPIRATION=7d
-DB_PATH=./database.db
-BCRYPT_SALT_ROUNDS=10
-CORS_ORIGIN=*
-```
+
+### Frontend
+- No `.env` file is used right now.
+- API base URL is set in `front-end/Crypto-Trading-React/src/config/api.js`.
 
 ## Backend Details
 
-### Entry point (`backend/index.js`)
-- Loads config and env.
-- Sets up CORS, JSON parsing, and request logging.
-- Opens SQLite connection and stores it in `app.set('db')`.
-- Routes:
-  - `/api/auth`
-  - `/api/groups`
-  - `/api/transactions`
-- Health endpoints:
-  - `GET /` returns service status
-  - `GET /health` returns health payload
-- Global error handling and 404 handling.
+### Entry point (`back-end/src/main/java/com/trading/trading_platform/TradingPlatformApplication.java`)
+- Spring Boot application bootstrap.
+- Configuration lives in `back-end/src/main/resources/application.properties`.
 
-### Middleware
-- `backend/middleware/auth.js`
-  - `authenticateToken`: verifies JWT and attaches `req.user`.
-  - `optionalAuth`: best-effort auth without failing.
-- `backend/middleware/errorHandler.js`
-  - `ApiError` class
-  - `errorHandler` for consistent error JSON
-  - `asyncHandler` wrapper for async routes
-- `backend/middleware/validation.js`
-  - `validateEmail`, `validatePassword`, `validateRequiredFields`
+### Security and Auth
+- JWT utilities in `back-end/src/main/java/com/trading/trading_platform/config`.
+- Auth endpoints in `back-end/src/main/java/com/trading/trading_platform/controller/AuthController.java`.
+- User profile and verification flows in `back-end/src/main/java/com/trading/trading_platform/controller/UserController.java`.
 
-### Database
-- SQLite database file: `backend/database.db`
-- Initialization script: `backend/database/initDb.js`
-- Schema reference: `backend/database/schema.sql` (PostgreSQL/MySQL compatible)
-- Tables:
-  - `users`: profile fields + `group_id`
-  - `groups`: 6-digit `group_number`
-  - `transactions`: expenses per group
-  - `payments`: per-user payments per transaction
-- Indexes for frequent lookups.
-- Foreign key relationships and cascading rules.
-
-### Database Utility Scripts
-- `backend/database/createTestUser.js`:
-  - Creates or updates a test user (`test@test.com` / `password123`).
-- `backend/database/updatePassword.js`:
-  - CLI to update password for an email.
-- `backend/database/models.js`:
-  - Model classes for User, Group, Transaction, Payment (not currently used by routes).
-- `backend/database/queries.js`:
-  - Query helpers (Postgres-style placeholders). Not used by current SQLite routes.
-
-### Backend Deployment
-- Render configuration in `backend/render.yaml`.
-- `buildCommand`: `npm install && npm run init:db`
-- `startCommand`: `npm start`
-- Health check: `/health`
+### Data Layer
+- JPA entities in `back-end/src/main/java/com/trading/trading_platform/model`.
+- Repositories in `back-end/src/main/java/com/trading/trading_platform/repository`.
+- Services in `back-end/src/main/java/com/trading/trading_platform/service`.
 
 ## API Reference
 
-Base URL:
-- Render: `https://sharelystbackend.onrender.com/api`
-- Local: `http://localhost:3000/api`
+Base URL (local):
+- `http://localhost:5455`
 
-### Auth (`/api/auth`)
-- `POST /register`
-  - Body: `username`, `firstName`, `lastName`, `email`, `phone?`, `password`, `confirmPassword`
-  - Returns: user info + JWT
-- `POST /login`
-  - Body: `identifier` (username or email), `password`
-  - Returns: user info + JWT
-- `POST /verify`
-  - Header: `Authorization: Bearer <token>`
-  - Returns: token validity + user data
-- `GET /me`
-  - Header: `Authorization: Bearer <token>`
-  - Returns: user profile
-- `PUT /profile`
-  - Header: `Authorization: Bearer <token>`
-  - Body: any of `firstName`, `lastName`, `email`, `phone`, `username`
-  - Returns: updated profile
-- `GET /ping`
-  - Used by frontend for connectivity status
+Most `/api/**` endpoints expect `Authorization: Bearer <jwt>`.
 
-### Groups (`/api/groups`)
-- `POST /create`
-  - Header: `Authorization: Bearer <token>`
-  - Body: `name`, `description?`
-  - Returns: group info + 6-digit group code
-- `POST /join`
-  - Header: `Authorization: Bearer <token>`
-  - Body: `groupCode` (6-digit number)
-- `GET /my-group`
-  - Header: `Authorization: Bearer <token>`
-  - Returns: group info + members or `null` if none
-- `POST /leave`
-  - Header: `Authorization: Bearer <token>`
-  - Removes user from group and deletes group if empty
+### Auth (`/auth`)
+- `POST /auth/signup`
+- `POST /auth/signin`
+- `POST /auth/two-factor/otp/{otp}?id=<sessionId>`
 
-### Transactions (`/api/transactions`)
-- `POST /create`
-  - Header: `Authorization: Bearer <token>`
-  - Body:
-    - `name`, `total`, `split` (boolean), `payments` array
-    - `payments` items: `{ user_id, amount }`
-- `GET /my-group`
-  - Header: `Authorization: Bearer <token>`
-  - Returns: all group transactions with payment details
-- `GET /total`
-  - Header: `Authorization: Bearer <token>`
-  - Returns: total amount of all group transactions
-- `GET /splitBills`
-  - Header: `Authorization: Bearer <token>`
-  - Returns: per-person totals + settlement plan
-- `POST /settleBills`
-  - Header: `Authorization: Bearer <token>`
-  - Body: `{ action: "reset" | "delete" }`
-- `GET /user-spendings`
-  - Header: `Authorization: Bearer <token>`
-  - Returns: total spent per user
-- `GET /:id`
-  - Header: `Authorization: Bearer <token>`
-  - Returns: transaction details with payments
+### Users
+- `GET /api/users/profile`
+- `GET /api/users/{userId}`
+- `PATCH /api/users/enable-two-factor/verify-otp/{otp}`
+- `POST /api/users/verification/{verificationType}/send-otp`
+- `POST /auth/users/reset-password/send-otp`
+- `PATCH /auth/users/reset-password/verify-otp?id=<sessionId>`
+
+### Coins (`/coins`)
+- `GET /coins?page=<page>`
+- `GET /coins/{coinId}/chart?days=<days>`
+- `GET /coins/search?q=<keyword>`
+- `GET /coins/top50`
+- `GET /coins/trending`
+- `GET /coins/details/{coinId}`
+
+### Assets (`/api/assets`)
+- `GET /api/assets`
+- `GET /api/assets/{assetId}`
+- `GET /api/assets/coin/{coinId}/user`
+
+### Orders (`/api/orders`)
+- `POST /api/orders/pay`
+- `GET /api/orders/{orderId}`
+- `GET /api/orders?order_type=<BUY|SELL>&asset_symbol=<symbol>`
+
+### Wallet
+- `GET /api/wallet`
+- `GET /api/wallet/transactions`
+- `PUT /api/wallet/order/{orderId}/pay`
+- `PUT /api/wallet/deposit?order_id=<id>&payment_id=<id>`
+- `PUT /api/wallet/{walletId}/transfer`
+- `GET /api/wallet/payment-success?order_id=<id>&payment_id=<id>`
+
+### Payments
+- `POST /api/payment/{paymentMethod}/amount/{amount}`
+
+### Payment Details
+- `POST /api/payment-details`
+- `GET /api/payment-details`
+
+### Watchlist (`/api/watchlist`)
+- `GET /api/watchlist/user`
+- `GET /api/watchlist/{watchlistId}`
+- `PATCH /api/watchlist/add/coin/{coinId}`
+
+### Withdrawals
+- `POST /api/withdrawal/{amount}`
+- `GET /api/withdrawal`
+- `GET /api/admin/withdrawal`
+- `PATCH /api/admin/withdrawal/{id}/proceed/{accept}`
+
+### Health
+- `GET /`
+- `GET /api`
 
 ## Frontend Details
 
 ### App Entry and Providers
-- `SharelystApp/app/_layout.tsx`:
-  - Wraps the app in `AuthProvider` and `ConnectionStatusProvider`.
-  - Controls authentication-based routing.
-  - Shows `ConnectionStatus` indicator.
+- `front-end/Crypto-Trading-React/src/main.jsx` bootstraps React, React Router, and Redux store.
+- `front-end/Crypto-Trading-React/src/App.jsx` handles auth gating and routes.
 
-### Auth Context
-- `SharelystApp/contexts/AuthContext.tsx`:
-  - Stores token in `expo-secure-store` under `auth_token`.
-  - Verifies token at startup with `/auth/verify`.
-  - Supports login/register/logout.
-  - Stores navigation preference (`navbar` or `hamburger`).
-  - Uses fallback API URLs if the primary API fails.
+### Routing
+- Auth flow: `front-end/Crypto-Trading-React/src/pages/Auth/Auth.jsx`
+- Main routes:
+  - `Home`, `Portfolio`, `Activity`, `Wallet`, `Withdrawal`, `Payment Details`, `Stock Details`, `WatchList`, `Profile`, `Search`
 
-### Connection Status
-- `SharelystApp/contexts/ConnectionStatusContext.tsx` + `components/ConnectionStatus.tsx`:
-  - Pings `/auth/ping` every 5 seconds.
-  - Displays green/red dot based on connectivity.
-
-### Navigation Structure (expo-router)
-
-- Auth flow:
-  - `app/login.tsx`
-  - `app/register.tsx`
-- Group setup flow:
-  - `app/groupchoice.tsx` (decides create vs join)
-  - `app/creategroup.tsx` (creates group and shows code)
-  - `app/findgroup.tsx` + `app/CodeInput.tsx` (join group)
-- Main tabs (`app/(tabs)/_layout.tsx`):
-  - `maingroup.tsx` (home dashboard)
-  - `activities.tsx` (all transactions)
-  - `people.tsx` (group members)
-  - `profile.tsx` (profile, settings, group actions)
-- Additional screens:
-  - `app/addactivity.tsx` (create transaction)
-  - `app/activitydetails.tsx` (transaction detail)
-  - `app/persondetails.tsx` (member spending breakdown)
-  - `app/split-bill.tsx` (bill split summary + settle actions)
-  - `app/modal.tsx` (template modal)
-  - `app/index.tsx` (default Expo starter screen)
-
-### Key Screen Behavior
-- `maingroup.tsx`
-  - Fetches group info, total spend, recent activities, and spendings.
-  - Shows group members and shortcuts to People/Activities.
-- `activities.tsx`
-  - Lists all transactions and links to details.
-- `people.tsx`
-  - Lists group members and their total spent.
-- `profile.tsx`
-  - Editable profile fields.
-  - Navigation style toggle (navbar vs hamburger).
-  - Group code display and leave group action.
-
-### Styling and UI
-- NativeWind setup:
-  - `tailwind.config.js` + `app/globals.css`
-  - `babel.config.js` sets `nativewind` preset
-  - `metro.config.js` wired with `withNativeWind`
-- Theme helpers:
-  - `constants/theme.ts` (colors and fonts)
-  - `hooks/use-theme-color.ts` + `use-color-scheme.ts`
-- Shared UI components:
-  - `components/haptic-tab.tsx`
-  - `components/themed-text.tsx`, `components/themed-view.tsx`
-  - `components/parallax-scroll-view.tsx` (Expo template)
-  - `components/external-link.tsx`
+### State Management
+- Redux store in `front-end/Crypto-Trading-React/src/State/Store.js`.
+- Auth actions in `front-end/Crypto-Trading-React/src/State/Auth/Action.js` store JWT in `localStorage`.
 
 ### API Configuration
-- `SharelystApp/config/api.ts`:
-  - Primary URL: Render backend
-  - Fallbacks: common local IPs and emulator address
-
-## Assets
-
-Images in `SharelystApp/assets/images/`:
-- App icons: `icon.png`, `android-icon-foreground.png`, `android-icon-background.png`, `android-icon-monochrome.png`
-- Splash screen: `splash-icon.png`
-- Web favicon: `favicon.png`
-- UI gradients: `gradient-1.png` through `gradient-6.png`
-- UI icons: `homeIcon.png`, `bookIcon.png`, `peopleIcon.png`, `profileIcon.png`, `arrow_back.png`, `track.png`
-- Expo template assets: `react-logo.png`, `react-logo@2x.png`, `react-logo@3x.png`, `partial-react-logo.png`
-
-## Development Notes
-
-- The backend uses SQLite; `initDb.js` builds the schema if needed.
-- In production, set a strong `JWT_SECRET` and restrict `CORS_ORIGIN`.
-- The frontend is designed to work even when the backend cold-starts; use `/auth/ping` to confirm readiness.
-- There are no automated tests configured in this repository.
-
-## Troubleshooting
-
-- Backend cold start (Render): visit `https://sharelystbackend.onrender.com/` until it responds.
-- App cannot connect:
-  - Check backend status.
-  - Confirm `API_URL` and fallbacks in `SharelystApp/config/api.ts`.
-- Expo cache issues:
-  - Run `npx expo start --clear` after installing packages.
-
-## Team
-
-- Yuriy Kotyashko
-- Stefewn Johnson
-- Muhammad Zamin
-- Daniel Chahine
+- `front-end/Crypto-Trading-React/src/config/api.js` sets the base API URL and JSON headers.
