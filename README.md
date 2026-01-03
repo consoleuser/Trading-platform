@@ -1,4 +1,4 @@
-# Trading Platform - Web Application
+# Lumora - Crypto Trading Webiste
 
 Trading Platform is a React + Vite frontend with a Spring Boot backend for crypto trading, wallet management, watchlists, and payments.
 
@@ -51,24 +51,6 @@ Trading Platform is a React + Vite frontend with a Spring Boot backend for crypt
 - MySQL
 - Stripe Java SDK
 - Spring Mail
-
-## Environment Variables
-
-### Backend (`back-end/src/main/resources/application.properties`)
-```
-spring.application.name=trading
-server.port=5455
-
-spring.jpa.hibernate.ddl-auto=update
-spring.datasource.url=jdbc:mysql://localhost:3306/crypto_trading
-spring.datasource.username=<your-db-user>
-spring.datasource.password=<your-db-password>
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-spring.jpa.show-sql=true
-
-gecko.api.key=<your-coingecko-api-key>
-stripe.api.key=<your-stripe-secret-key>
-```
 
 ### Frontend
 - No `.env` file is used right now.
