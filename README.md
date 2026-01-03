@@ -1,6 +1,8 @@
 # Lumora - Crypto Trading Webiste
 
-Trading Platform is a React + Vite frontend with a Spring Boot backend for crypto trading, wallet management, watchlists, and payments.
+Lumora is a React + Vite frontend with a Spring Boot backend for crypto trading, wallet management, watchlists, and payments.
+<img width="2868" height="1540" alt="image" src="https://github.com/user-attachments/assets/ee189e61-c0e1-42c6-9018-7dc2d9c8e40d" />
+
 
 ## Repository Layout
 
